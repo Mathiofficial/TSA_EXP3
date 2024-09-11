@@ -1,5 +1,5 @@
-### NAME  : KARTHIKEYAN R
-### Reg.No:212222240046
+### NAME  : Mathiyazhagan A
+### Reg.No:212222240063
 ### Date  :
 # Ex.No: 03   COMPUTE THE AUTO FUNCTION(ACF)
 ### AIM:
