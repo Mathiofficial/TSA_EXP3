@@ -13,43 +13,49 @@ type to fit the data.
 5. Represent the result in graphical representation as given below.
 ### PROGRAM:
 ```
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
-# Load the weather dataset
-weather_data = pd.read_csv("/path/to/weather_data.csv")
+# Load the dataset
+data = pd.read_csv("/content/seattle_weather_1948-2017.csv")  # replace "weather_data.csv" with your actual file name
 
-# Print the columns of the DataFrame to check their exact names
-print(weather_data.columns)
+# Convert the 'DATE' column to datetime format
+data['DATE'] = pd.to_datetime(data['DATE'])
 
-# Extract the 'PRCP' column (precipitation data) for ACF calculation
-prcp_data = weather_data['PRCP'].values
-
-# Calculate mean and variance
-mean_prcp = np.mean(prcp_data)
-var_prcp = np.var(prcp_data)
+# Select the temperature data ('TMAX') as the time series data
+time_series = data['TMAX'] 
 ```
 ```
-# Normalize the data (subtract mean and divide by standard deviation)
-normalized_prcp = (prcp_data - mean_prcp) / np.sqrt(var_prcp)
+# Parameters for the ACF calculation
+n_data_points = len(time_series)
+n_lags = min(35, n_data_points - 1)
+acf_values = np.zeros(n_lags)
 
-# Compute the ACF for the first 35 lags
-lags = range(35)
-acf_values = [np.corrcoef(normalized_prcp[:-lag], normalized_prcp[lag:])[0, 1] if lag != 0 else 1 for lag in lags]
+# Calculate the mean and variance of the time series
+mean = np.mean(time_series)
+variance = np.var(time_series)
 
-# Plot the ACF results
+# Normalize the time series by subtracting the mean
+normalized_data = time_series - mean
+
+# Compute ACF manually
+for lag in range(n_lags):
+    lagged_data = np.roll(normalized_data, -lag)
+    acf_values[lag] = np.sum(normalized_data[:n_data_points-lag] * lagged_data[:n_data_points-lag]) / (variance * (n_data_points - lag))
+
+# Plot the ACF values
 plt.figure(figsize=(10, 6))
-plt.stem(lags, acf_values, use_line_collection=True)
-plt.title('Autocorrelation Function (ACF) for Precipitation Data')
+plt.stem(range(n_lags), acf_values)
+plt.title(f'ACF Plot (Manual Calculation, Lags: {n_lags})')
 plt.xlabel('Lag')
 plt.ylabel('ACF')
-plt.grid(True)
 plt.show()
 
 ```
 ### OUTPUT:
-![image](https://github.com/user-attachments/assets/d86e3c07-671a-4c60-ba86-a6968c4c1358)
+![image](https://github.com/user-attachments/assets/2bdd6f4f-cd26-4e5a-be29-b412c89b7e28)
+
 
 
 ### RESULT:
